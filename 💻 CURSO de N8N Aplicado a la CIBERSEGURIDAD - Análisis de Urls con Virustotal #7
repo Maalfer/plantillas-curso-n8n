@@ -178,14 +178,14 @@
       "parameters": {
         "sendTo": "elpinguinodemario@gmail.com",
         "subject": "Reportes Adjunto Último Correo",
-        "message": "={{ $json.mensaje }}",
+        "message": "=El número de reportes del adjunto es: {{ $json.data.attributes.stats.malicious }}\n\n{{ $json.mensaje }}",
         "options": {}
       },
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        1780,
-        -260
+        1640,
+        -240
       ],
       "id": "e8438db6-1668-48c6-a35f-c50756fa1efd",
       "name": "Send a message",
@@ -323,28 +323,19 @@
       "name": "Code2"
     },
     {
-      "parameters": {},
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
       "position": [
-        1320,
-        -260
+        1360,
+        -240
       ],
-      "id": "b11541ec-51ac-4cb9-aa38-3052dc9e3cc9",
-      "name": "Merge"
-    },
-    {
-      "parameters": {
-        "jsCode": "// Accede a la estructura correcta dentro de items en n8n\nconst maliciousAdjunto = items[0]?.json?.data?.attributes?.stats?.malicious ?? \"no disponible\";\nconst mensajeHtml = items[1]?.json?.mensaje ?? \"\";\n\nconst regex = /<li><strong>(https?:\\/\\/[^<]+)<\\/strong>: (\\d+) detecciones maliciosas<\\/li>/g;\n\nlet match;\nconst resultados = [];\n\nwhile ((match = regex.exec(mensajeHtml)) !== null) {\n  resultados.push({\n    url: match[1],\n    malicious: Number(match[2]),\n  });\n}\n\nconst listaUrls = resultados.map(item => {\n  return `<li><strong>${item.url}</strong>: ${item.malicious} detecciones maliciosas</li>`;\n}).join(\"\\n\");\n\nconst mensajeFinal = `\n  <p>El número de reportes del adjunto es: <strong>${maliciousAdjunto}</strong></p>\n  <p>A continuación se proporciona el análisis de URLs en los correos que te han llegado:</p>\n  <ul>\n    ${listaUrls}\n  </ul>\n`;\n\nreturn [{\n  json: {\n    mensaje: mensajeFinal.trim(),\n    urls: resultados,\n    maliciousAdjunto: maliciousAdjunto\n  }\n}];\n"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        1540,
-        -260
-      ],
-      "id": "b371edd8-a29b-41d8-86d6-e06da5311271",
-      "name": "Code3"
+      "id": "b520cb9a-9f60-4b84-b589-8b6be921ad10",
+      "name": "Merge1"
     }
   ],
   "pinData": {},
@@ -413,7 +404,7 @@
       "main": [
         [
           {
-            "node": "Merge",
+            "node": "Merge1",
             "type": "main",
             "index": 0
           }
@@ -484,25 +475,14 @@
       "main": [
         [
           {
-            "node": "Merge",
+            "node": "Merge1",
             "type": "main",
             "index": 1
           }
         ]
       ]
     },
-    "Merge": {
-      "main": [
-        [
-          {
-            "node": "Code3",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Code3": {
+    "Merge1": {
       "main": [
         [
           {
@@ -518,7 +498,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "9da46fdb-c1dc-444b-9355-2c7364b50cd5",
+  "versionId": "b1b02171-e342-42f8-97df-5e6dd465e870",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "d010112b06453b20b26c56381bf16aa21da2e4aa319404b0f78dc0e11e94f7da"
