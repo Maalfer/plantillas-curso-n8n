@@ -1,0 +1,308 @@
+{
+  "name": "correos analizar",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "=https://www.ipqualityscore.com/api/json/email/0k4Cx1JZJdJklKZCn9y7jlbAdgYguRDP/{{ $json.emailExtraido }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        20,
+        -60
+      ],
+      "id": "f2aec186-5cd6-4687-ac90-6bf446db27dd",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -640,
+        -220
+      ],
+      "id": "b67de809-2a9f-4448-a89a-7f9f877e8d4a",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "XFd2hWuKqCCN8y5s",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "939e24c2-49f1-4470-a8e5-f131119b14bc",
+              "leftValue": "={{ $json.labels[0].id }}",
+              "rightValue": "SENT",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -420,
+        -220
+      ],
+      "id": "a506337d-ada1-4d7f-90d6-66c42225af1e",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f35d1c39-4462-4fde-9bc8-1921bb7db60d",
+              "leftValue": "={{ $json.fraud_score }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        240,
+        -60
+      ],
+      "id": "bad76241-ce96-405b-8c92-5a3c316d630d",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "47ca1d6e-09c4-4821-8fbd-39be50caedb5",
+              "name": "sanitized_email",
+              "value": "={{ $json.sanitized_email }} -> {{ $json.fraud_score }}\n\nAsunto del correo -> {{ $json.subject }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        840,
+        0
+      ],
+      "id": "4d754eaa-2d59-4174-ae56-f6c9ee91711c",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "sendTo": "marioalvarezfdz@gmail.com",
+        "subject": "Análisis de tu último correo",
+        "message": "={{ $json.htmlEmailContent }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1360,
+        0
+      ],
+      "id": "8bd80628-af46-4406-bc2f-a6674931717c",
+      "name": "Send a message",
+      "webhookId": "80d44e6b-f864-4d15-bd80-85426b07b041",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "XFd2hWuKqCCN8y5s",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const output = [];\n\nfor (const item of $input.all()) {\n  const fromField = item.json[\"From\"];\n  const subjectField = item.json[\"Subject\"];\n\n  const emailMatch = fromField.match(/<([^>]+)>/);\n  const emailExtraido = emailMatch ? emailMatch[1] : fromField;\n\n  output.push({\n    json: {\n      emailExtraido: emailExtraido,\n      subject: subjectField\n    }\n  });\n}\n\nreturn output;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -220,
+        140
+      ],
+      "id": "c99d01d2-877b-4c08-bdaa-97688fc426b6",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        520,
+        120
+      ],
+      "id": "7f075a56-479a-48ae-8770-984d27150a79",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "const output = [];\n\nfor (const item of $input.all()) {\n  const rawText = item.json.sanitized_email;\n\n  // Limpieza y formato\n  const lines = rawText.split('\\n').map(line => line.trim()).filter(Boolean);\n\n  let htmlContent = `<div style=\"font-family: Arial, sans-serif; font-size: 14px;\">`;\n\n  for (const line of lines) {\n    const parts = line.split('->');\n    if (parts.length === 2) {\n      const label = parts[0].trim();\n      const value = parts[1].trim();\n      htmlContent += `<p><strong>${label}:</strong> ${value}</p>`;\n    } else {\n      htmlContent += `<p>${line}</p>`;\n    }\n  }\n\n  htmlContent += `</div>`;\n\n  output.push({\n    json: {\n      htmlEmailContent: htmlContent\n    }\n  });\n}\n\nreturn output;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        0
+      ],
+      "id": "3a52e72d-05e2-4e1e-9b62-810eb7f17415",
+      "name": "Code1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e5dac97b-a560-4cf5-ba5f-434b5d835ea7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "29357540bc43a667fe4b051505cab1dedb7ab529682ce4aed847860ea6317966"
+  },
+  "id": "RkFmAsgeS2C8c3rt",
+  "tags": []
+}
