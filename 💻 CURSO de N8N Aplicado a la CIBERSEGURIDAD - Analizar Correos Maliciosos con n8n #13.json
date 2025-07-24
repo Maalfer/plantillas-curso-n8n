@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "url": "=https://www.ipqualityscore.com/api/json/email/0k4Cx1JZJdJklKZCn9y7jlbAdgYguRDP/{{ $json.emailExtraido }}",
+          "url": "=https://www.ipqualityscore.com/api/json/email/YOUR-API/{{ $json.emailExtraido }}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
