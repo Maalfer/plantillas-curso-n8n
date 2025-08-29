@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Verificar cuenta{% endblock %}
+{% block content %}
+<h2>Verificación por PIN</h2>
+<p>Introduce el PIN que te enviamos a través de n8n para verificar tu cuenta.</p>
+
+<form method="post">
+  <label>Email
+    <input type="email" name="email" value="{{ email or '' }}" required>
+  </label>
+  <label>PIN de verificación
+    <input
+      type="text"
+      name="code"
+      inputmode="numeric"
+      pattern="[0-9]{6}"
+      maxlength="6"
+      placeholder="123456"
+      required
+      autocomplete="one-time-code"
+    >
+  </label>
+  <button type="submit">Verificar</button>
+</form>
+
+<p>¿No recibiste el PIN? Vuelve a <a href="{{ url_for('register') }}">Registrarte</a> para reenviarlo.</p>
+{% endblock %}

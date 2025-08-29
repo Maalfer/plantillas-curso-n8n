@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Flask PIN n8n{% endblock %}</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+<style>
+body { max-width: 720px; margin: 2rem auto; }
+.flash { margin-bottom: 0.75rem; }
+</style>
+</head>
+<body>
+<main>
+<nav>
+<ul>
+<li><strong>Flask + PIN</strong></li>
+</ul>
+<ul>
+{% if session.get('user_id') %}
+<li><a href="{{ url_for('dashboard') }}">Panel</a></li>
+<li><a href="{{ url_for('logout') }}">Salir</a></li>
+{% else %}
+<li><a href="{{ url_for('login') }}">Entrar</a></li>
+<li><a href="{{ url_for('register') }}">Registro</a></li>
+{% endif %}
+</ul>
+</nav>
+
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="flash" data-theme="{{ 'warning' if category in ['error','warning'] else 'light' }}">
+{{ message }}
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+
+{% block content %}{% endblock %}
+</main>
+</body>
+</html>
