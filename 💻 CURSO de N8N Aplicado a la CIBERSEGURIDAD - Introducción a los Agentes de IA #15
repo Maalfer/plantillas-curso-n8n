@@ -1,1 +1,136 @@
-
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Tengo las siguientes máquinas con su fecha, y quiero que las analices y me digas la máquina más antigua\n\n{{ $json.nombre }} {{ $json.fecha }}",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        64,
+        -256
+      ],
+      "id": "943b83ba-7805-49e2-b71b-19880b8bc97b",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": "llama3.2:1b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmOllama",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        -32
+      ],
+      "id": "a90fa875-8778-41ff-86ff-49db68c681bc",
+      "name": "Ollama Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "Hil3kuQ9MzPy5g7A",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -720,
+        -96
+      ],
+      "id": "039da2ce-6acf-4e4b-bea5-d3bb0ff89907",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://dockerlabs.es/api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -512,
+        -208
+      ],
+      "id": "0e061f1a-82f6-4f41-8535-50940de3561d",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtenemos los items de entrada\nconst items = $input.all();\n\n// Aquí guardaremos los resultados transformados\nlet results = [];\n\n// Recorremos cada item que viene de entrada\nfor (const item of items) {\n  const maquinas = item.json.info_maquinas || [];\n  \n  // Por cada máquina creamos un nuevo item con solo nombre y fecha\n  for (const maquina of maquinas) {\n    results.push({\n      json: {\n        nombre: maquina.nombre,\n        fecha: maquina.fecha\n      }\n    });\n  }\n}\n\n// Nos quedamos solo con las primeras 5\nreturn results.slice(0, 5);\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -224,
+        -208
+      ],
+      "id": "04c168d2-5f49-4740-9ba9-c3319e9848ae",
+      "name": "Code"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Ollama Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "079a299c-da65-4adb-9850-b269d5a75427",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9031283b50ac27f853d368d66cc81fc09d370114ac6e96e0158873cddde06906"
+  },
+  "id": "6sjQlVNjvMf7dT24",
+  "tags": []
+}
