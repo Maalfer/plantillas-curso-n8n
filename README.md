@@ -3,7 +3,7 @@
 Bienvenido/a a este repositorio donde encontrarás **recursos, ejemplos y material de apoyo** para el curso de **n8n aplicado a la ciberseguridad**.  
 El objetivo de este curso es enseñar cómo aprovechar el poder de la **automatización con n8n** en escenarios de **seguridad informática, hacking ético y respuesta a incidentes**.  
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/TEe990b01aE?si=VN_zE9p85yX7CvGB" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+https://www.youtube.com/watch?v=TEe990b01aE
 
 ---
 
