@@ -4,7 +4,7 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "=Tengo las siguientes máquinas con su fecha, y quiero que las analices y me digas la máquina más antigua\n\n{{ $json.nombre }} {{ $json.fecha }}",
+        "text": "=Tengo los siguientes nombres y cada uno tiene una fecha, y quiero que me digas el nombre más antiguo\n\n{{ $json.nombre }} {{ $json.fecha }}",
         "batching": {}
       },
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -126,7 +126,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "079a299c-da65-4adb-9850-b269d5a75427",
+  "versionId": "c4ad1ca8-ffc8-45ef-8217-06fc9bdb9b17",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "9031283b50ac27f853d368d66cc81fc09d370114ac6e96e0158873cddde06906"
