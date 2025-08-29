@@ -4,7 +4,7 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "=Tengo los siguientes nombres y cada uno tiene una fecha, y quiero que me digas el nombre más antiguo\n\n{{ $json.nombre }} {{ $json.fecha }}",
+        "text": "=Tengo los siguientes nombres de productos de mi tienda y cada uno tiene una fecha, y quiero que me digas el nombre del producto con la fecha más antigua:\n\n{{ JSON.stringify($json.maquinas) }}",
         "batching": {}
       },
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -63,7 +63,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Obtenemos los items de entrada\nconst items = $input.all();\n\n// Aquí guardaremos los resultados transformados\nlet results = [];\n\n// Recorremos cada item que viene de entrada\nfor (const item of items) {\n  const maquinas = item.json.info_maquinas || [];\n  \n  // Por cada máquina creamos un nuevo item con solo nombre y fecha\n  for (const maquina of maquinas) {\n    results.push({\n      json: {\n        nombre: maquina.nombre,\n        fecha: maquina.fecha\n      }\n    });\n  }\n}\n\n// Nos quedamos solo con las primeras 5\nreturn results.slice(0, 5);\n"
+        "jsCode": "// Obtenemos los items de entrada\nconst items = $input.all();\n\n// Aquí guardaremos todas las máquinas transformadas\nlet results = [];\n\n// Recorremos cada item que viene de entrada\nfor (const item of items) {\n  const maquinas = item.json.info_maquinas || [];\n  \n  // Por cada máquina creamos un objeto con solo nombre y fecha\n  for (const maquina of maquinas) {\n    results.push({\n      nombre: maquina.nombre,\n      fecha: maquina.fecha\n    });\n  }\n}\n\n// Nos quedamos solo con las primeras 5\nresults = results.slice(0, 5);\n\n// Devolvemos todo en un único item\nreturn [\n  {\n    json: {\n      maquinas: results\n    }\n  }\n];\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -126,7 +126,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "c4ad1ca8-ffc8-45ef-8217-06fc9bdb9b17",
+  "versionId": "ee908796-40d6-477f-b1bb-698d2133aa23",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "9031283b50ac27f853d368d66cc81fc09d370114ac6e96e0158873cddde06906"
